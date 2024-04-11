@@ -1,21 +1,20 @@
-
 %%%
-title = "prom2ssh 8"
+title = "ssh2prom 8"
 area = "System Administration"
 workgroup = "Prometheus"
 %%%
 
 # NAME
 
-prom2ssh - export failed logins to prometheus
+ssh2prom - export failed logins to prometheus
 
 # SYNOPSIS
 
-**dnsfmt** [**OPTIONS**]...
+**ssh2prom** [**OPTIONS**]...
 
 # DESCRIPTION
 
-**Prom2ssh** parsed the journald of ssh and extract failed login attemps. It exports two metrics
+**Ssh2prom** parsed the journald of ssh and extract failed login attemps. It exports two metrics
 
 - ssh_failed_total{}
 - ssh_failed_root_total{}
