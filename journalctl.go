@@ -15,7 +15,6 @@ const journalctl = "journalctl"
 func journalReader(unitName string) (io.ReadCloser, func() error, error) {
 	cancel := func() error { return nil } // initialize as noop
 
-	// Handle all the options.
 	args := []string{"-u", unitName, "--no-hostname"} // only works with -o short-xxx options.
 	args = append(args, "-f")                         // tail
 
@@ -83,44 +82,3 @@ func journalFollow(until <-chan time.Time, r io.Reader, w io.Writer) error {
 		}
 	}
 }
-
-/* use as
-   logsReader, cancel, err := journalReader(namespace, pod, container, opts)
-   if err != nil {
-           return errors.Wrap(err, "failed to get systemd journal logs reader")
-   }
-   defer logsReader.Close()
-   defer cancel()
-
-   // ResponseWriter must be flushed after each write.
-   if _, ok := w.(writeFlusher); !ok {
-           log.Warn("HTTP response writer does not support flushes")
-   }
-   fw := flushOnWrite(w)
-
-   if !opts.Follow {
-           io.Copy(fw, logsReader)
-           return nil
-   }
-
-   // If in follow mode, follow until interrupted.
-   untilTime := make(chan time.Time, 1)
-   errChan := make(chan error, 1)
-
-   go func(w io.Writer, errChan chan error) {
-           err := journalFollow(untilTime, logsReader, w)
-           if err != nil && err != ErrExpired {
-                   err = errors.Wrap(err, "failed to follow systemd journal logs")
-           }
-           errChan <- err
-   }(fw, errChan)
-
-   // Stop following logs if request context is completed.
-   select {
-   case err := <-errChan:
-           return err
-   case <-r.Context().Done():
-           close(untilTime)
-   }
-   return nil
-*/
