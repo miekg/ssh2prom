@@ -45,8 +45,8 @@ var ErrExpired = errors.New("timeout expired")
 
 // journalFollow synchronously follows the io.Reader, writing each new journal entry to writer. The
 // follow will continue until a single time.Time is received on the until channel (or it's closed).
-func journalFollow(until <-chan time.Time, reader io.Reader, writer io.Writer) error {
-	scanner := bufio.NewScanner(reader)
+func journalFollow(until <-chan time.Time, r io.Reader, w io.Writer) error {
+	scanner := bufio.NewScanner(r)
 	bufch := make(chan []byte)
 	errch := make(chan error)
 
@@ -73,10 +73,11 @@ func journalFollow(until <-chan time.Time, reader io.Reader, writer io.Writer) e
 			return err
 
 		case buf := <-bufch:
-			if _, err := writer.Write(buf); err != nil {
+			if _, err := w.Write(buf); err != nil {
 				return err
 			}
-			if _, err := io.WriteString(writer, "\n"); err != nil {
+			// re-add the newline
+			if _, err := w.Write([]byte("\n")); err != nil {
 				return err
 			}
 		}
