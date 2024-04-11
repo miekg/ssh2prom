@@ -12,6 +12,7 @@ import (
 var (
 	flgUnit = flag.String("u", "ssh", "name of the ssh unit")
 	flgDry  = flag.Bool("n", false, "dry run only show parsed lines")
+	flgAddr = flag.String("a", ":9396", "address to run prometheus exporter on")
 )
 
 func main() {
@@ -28,7 +29,10 @@ func main() {
 	untilTime := make(chan time.Time, 1)
 	errChan := make(chan error, 1)
 
-	w := os.Stdout
+	var w io.Writer = os.Stdout
+	if !*flgDry {
+		w = metricsWriter{}
+	}
 
 	go func(w io.Writer, errChan chan error) {
 		err := journalFollow(untilTime, r, w)
