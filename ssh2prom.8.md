@@ -17,13 +17,11 @@ prom2ssh - export failed logins to prometheus
 
 **Prom2ssh** parsed the journald of ssh and extract failed login attemps. It exports two metrics
 
-- ssh_failed_total{}
-- ssh_failed_root_total{}
+- ssh_failed_total{family="1|2"}: all failed logins
+- ssh_failed_root_total{family="1|2"}: failed logins for root only
+- ssh_sucess_total{}: all successful logins
 
-That can be scraped by prometheus.
-
-No semantic checks are done, this is purely text manipulation with some basic zone file syntax
-understanding.
+If family is 1 it is an IPv4 connection, for 2 it is coming over IPv6.
 
 # OPTIONS
 

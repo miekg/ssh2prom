@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	failedRootLogins = promauto.NewCounter(prometheus.CounterOpts{
+	failedRootLogins = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "ssh_failed_root_total",
 		Help: "Counter of failed root logins.",
-	})
-	failedUserLogins = promauto.NewCounter(prometheus.CounterOpts{
+	}, []string{"family"})
+	failedUserLogins = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "ssh_failed_total",
 		Help: "Counter of total failed logins.",
-	})
+	}, []string{"family"})
 	userLogins = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "ssh_sucess_total",
 		Help: "Counter of total successful logins.",
