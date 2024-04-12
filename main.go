@@ -4,7 +4,6 @@ import (
 	"flag"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -35,19 +34,18 @@ func main() {
 	untilTime := make(chan time.Time, 1)
 	errChan := make(chan error, 1)
 
-	var w io.Writer = os.Stdout
-	if !*flgDry {
-		w = metricsWriter{}
-	}
+	w := metricsWriter{}
 
-	http.Handle("/metrics", promhttp.Handler())
-	log.Infof("Starting Prometheus on address %q", *flgAddr)
-	go func() {
-		err := http.ListenAndServe(*flgAddr, nil)
-		if err != nil {
-			log.Fatalf("Could not start HTTP server: %s", err)
-		}
-	}()
+	if !*flgDry {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Infof("Starting Prometheus on address %q", *flgAddr)
+		go func() {
+			err := http.ListenAndServe(*flgAddr, nil)
+			if err != nil {
+				log.Fatalf("Could not start HTTP server: %s", err)
+			}
+		}()
+	}
 
 	go func(w io.Writer, errChan chan error) {
 		err := journalFollow(untilTime, r, w)

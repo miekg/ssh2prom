@@ -14,17 +14,15 @@ ssh2prom - export failed logins to prometheus
 \fBSsh2prom\fP parsed the journald of ssh and extract failed login attemps. It exports two metrics
 
 .IP \(bu 4
-ssh_failed_total{}
+ssh_failed_total{family="1|2"}: all failed logins
 .IP \(bu 4
-ssh_failed_root_total{}
+ssh_failed_root_total{family="1|2"}: failed logins for root only
+.IP \(bu 4
+ssh_sucess_total{}: all successful logins
 
 
 .PP
-That can be scraped by prometheus.
-
-.PP
-No semantic checks are done, this is purely text manipulation with some basic zone file syntax
-understanding.
+If family is 1 it is an IPv4 connection, for 2 it is coming over IPv6.
 
 .SH "OPTIONS"
 .TP
@@ -32,10 +30,10 @@ understanding.
 Start the prometheus server on \fIADDR\fP
 .TP
 \fB\fC-d\fR
-Enable debugging, show the logs and parsed users
+Enable debugging, show the logs and parsed users and address family
 .TP
 \fB\fC-n\fR
-Dry run, do everything except export the metrics
+Dry run, do everything except exporting the metrics
 .TP
 \fB\fC-u\fR \fBUNIT\fP
 Use unit \fBUNIT\fP instead of "ssh"
