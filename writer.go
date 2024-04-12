@@ -19,6 +19,7 @@ type metricsWriter struct{}
 var (
 	InvalidUser = []byte("Failed password for invalid user ")
 	InvalidRoot = []byte("Failed password for root")
+	ValidUser   = []byte("session opened for user ") // xxxx(uid=
 )
 
 func (mw metricsWriter) Write(p []byte) (int, error) {
@@ -48,6 +49,20 @@ func (mw metricsWriter) Write(p []byte) (int, error) {
 		if !*flgDry {
 			failedRootLogins.Inc()
 			failedUserLogins.Inc() // also inc the total
+		}
+	}
+	i = bytes.Index(p, ValidUser)
+	if i > 0 {
+		brace := bytes.Index(p[i+len(ValidUser):], []byte("("))
+		if brace != 0 {
+			start := i + len(ValidUser)
+			end := start + brace
+			user := string(p[start:end])
+			log.Debugf("Valid user: %q", user)
+			if !*flgDry {
+				userLogins.Inc()
+			}
+			return len(p), nil
 		}
 	}
 	return len(p), nil
