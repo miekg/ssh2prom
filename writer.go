@@ -23,6 +23,7 @@ var (
 var (
 	Space = []byte(" ")
 	Colon = []byte(":")
+	Brace = []byte("(")
 )
 
 func (mw metricsWriter) Write(p []byte) (int, error) {
@@ -30,10 +31,10 @@ func (mw metricsWriter) Write(p []byte) (int, error) {
 		return len(p), nil
 	}
 	p = p[:len(p)-1]
-	log.Debugf("%s", p)
 	family := "1"
 	i := bytes.Index(p, InvalidUser)
 	if i > 0 {
+		log.Debugf("%s", p)
 		space := bytes.Index(p[i+len(InvalidUser):], Space)
 		if space != 0 {
 			start := i + len(InvalidUser)
@@ -43,7 +44,7 @@ func (mw metricsWriter) Write(p []byte) (int, error) {
 			if colon > 0 {
 				family = "2"
 			}
-			log.Debugf("User: %q", user)
+			log.Debugf("User: %q (fam=%s)", user, family)
 			if !*flgDry {
 				failedUserLogins.WithLabelValues(family).Inc()
 			}
@@ -52,20 +53,23 @@ func (mw metricsWriter) Write(p []byte) (int, error) {
 	}
 	i = bytes.Index(p, InvalidRoot)
 	if i > 0 {
-		log.Debugf("User: %q", "root")
+		log.Debugf("%s", p)
 		end := i + len(InvalidRoot)
 		colon := bytes.Index(p[end:], Colon)
 		if colon > 0 {
 			family = "2"
 		}
+		log.Debugf("User: %q (fam=%s)", "root", family)
 		if !*flgDry {
 			failedRootLogins.WithLabelValues(family).Inc()
 			failedUserLogins.WithLabelValues(family).Inc() // also inc the total
 		}
+		return len(p), nil
 	}
 	i = bytes.Index(p, ValidUser)
 	if i > 0 {
-		brace := bytes.Index(p[i+len(ValidUser):], Space)
+		log.Debugf("%s", p)
+		brace := bytes.Index(p[i+len(ValidUser):], Brace)
 		if brace != 0 {
 			start := i + len(ValidUser)
 			end := start + brace

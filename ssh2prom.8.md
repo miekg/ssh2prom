@@ -29,10 +29,10 @@ If family is 1 it is an IPv4 connection, for 2 it is coming over IPv6.
 : Start the prometheus server on *ADDR*
 
 `-d`
-: Enable debugging, show the logs and parsed users
+: Enable debugging, show the logs and parsed users and address family
 
 `-n`
-: Dry run, do everything except export the metrics
+: Dry run, do everything except exporting the metrics
 
 `-u` **UNIT**
 : Use unit **UNIT** instead of "ssh"
