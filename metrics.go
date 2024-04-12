@@ -15,7 +15,7 @@ var (
 		Help: "Counter of total failed logins.",
 	}, []string{"family"})
 	userLogins = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "ssh_sucess_total",
+		Name: "ssh_success_total",
 		Help: "Counter of total successful logins.",
 	})
 )
